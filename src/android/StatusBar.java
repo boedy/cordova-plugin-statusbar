@@ -27,6 +27,7 @@ import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import org.apache.cordova.CallbackContext;
@@ -85,6 +86,11 @@ public class StatusBar extends CordovaPlugin {
             setStatusBarStyle(
                 preferences.getString("StatusBarStyle", STYLE_LIGHT_CONTENT).toLowerCase()
             );
+
+            // Read 'HideNavigationBar' from config.xml, default is false.
+            if (preferences.getBoolean("HideNavigationBar", false)) {
+                hideNavigationBar();
+            }
         });
     }
 
@@ -195,6 +201,14 @@ public class StatusBar extends CordovaPlugin {
         if (isTransparent) {
             window.setStatusBarColor(Color.TRANSPARENT);
         }
+    }
+
+    private void hideNavigationBar() {
+        View decorView = window.getDecorView();
+        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(window, decorView);
+        // BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE = 2 (added in core 1.6.0)
+        controller.setSystemBarsBehavior(2);
+        controller.hide(WindowInsetsCompat.Type.navigationBars());
     }
 
     private void setStatusBarStyle(final String style) {
